@@ -1,0 +1,10 @@
+**/*.cache/
+**/*.runs/
+**/*.sim/
+**/sim/results/
+**/sim/build
+vivado_pid*
+vivado*.jou
+vivado*.log
+*.swp
+.DS_Store
