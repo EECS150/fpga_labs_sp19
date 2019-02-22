@@ -30,8 +30,8 @@ module echo_testbench();
     z1top #(
         .CLOCK_FREQ(`CLOCK_FREQ),
         .BAUD_RATE(`BAUD_RATE),
-        .B_SAMPLE_COUNT_MAX(1),
-        .B_PULSE_COUNT_MAX(1)
+        .B_SAMPLE_COUNT_MAX(4),
+        .B_PULSE_COUNT_MAX(4)
     ) top (
         .CLK_125MHZ_FPGA(clk),
         .BUTTONS(3'd0),
@@ -76,16 +76,21 @@ module echo_testbench();
 
         // Pulse the reset signal long enough to be detected by the debouncer in z1top
         reset = 1'b1;
-        repeat (10) @(posedge clk);
+        repeat (40) @(posedge clk);
         reset = 1'b0;
+        
+	//Reset on FPGA should occur on positive edge of reset for 1 cycle
 
         // Wait until the off-chip UART transmitter is ready to transmit
         while (!data_in_ready) @(posedge clk);
 
         // Once the off-chip UART transmitter is ready, pulse data_in_valid to tell it that
         // we have valid data that we want it to send over the serial line
+        //Will set this on negedge to make semantics more clear
+        @(negedge clk);
         data_in_valid = 1'b1;
-        @(posedge clk);
+        //@(posedge clk);
+        @(negedge clk);
         data_in_valid = 1'b0;
         $display("off-chip UART about to transmit: %h to the on-chip UART", data_in);
 
