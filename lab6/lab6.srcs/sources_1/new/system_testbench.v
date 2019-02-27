@@ -4,6 +4,9 @@
 `define MS 1000000
 `define SYSTEM_CLK_PERIOD 8
 
+`define CLOCK_FREQ 125_000_000
+`define BAUD_RATE 115_200
+
 module system_testbench();
     // System clock domain I/O
     reg system_clock = 0;
@@ -15,21 +18,24 @@ module system_testbench();
     reg [2:0] buttons;
     reg [1:0] switches;
 
+    wire FPGA_SERIAL_RX, FPGA_SERIAL_TX;
+
     // Generate system clock
     always #(`SYSTEM_CLK_PERIOD/2) system_clock = ~system_clock;
 
-    z1top z1_default_params (
+    z1top #(.B_SAMPLE_COUNT_MAX(4), .B_PULSE_COUNT_MAX(4)) top (
       .RESET(system_reset),
       .CLK_125MHZ_FPGA(system_clock),
       .BUTTONS(buttons),
       .SWITCHES(switches),
       .LEDS(leds),
-      .PMOD_LEDS(leds),
       .MCLK(mclk),
       .LRCLK(lrck),
       .SCLK(sclk),
       .SDIN(sdin),
-      .AUDIO_PWM(audio_pwm)
+      .aud_pwm(audio_pwm),
+      .FPGA_SERIAL_RX(FPGA_SERIAL_RX),
+      .FPGA_SERIAL_TX(FPGA_SERIAL_TX)
     );
     
     // Instantiate an off-chip UART here that uses the RX and TX lines
